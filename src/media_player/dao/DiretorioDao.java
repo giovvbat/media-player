@@ -12,7 +12,7 @@ public class DiretorioDao {
 
     public void cadastrarDiretorio(String caminho) throws IOException {
         String caminhoArquivo = "arquivos/diretorios.txt";
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminhoArquivo))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminhoArquivo, true))) {
             writer.write(caminho);
             writer.newLine();
             diretorios.add(caminho);
