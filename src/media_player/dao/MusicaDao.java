@@ -11,6 +11,10 @@ import media_player.modelo.Musica;
 public class MusicaDao {
     ArrayList<Musica> musicas;
 
+    public ArrayList<Musica> getMusicas() {
+        return musicas;
+    }
+
     public void carregarMusicas() throws IOException {
         String caminhoArquivo = "arquivos/musicas.txt";
         File arquivo = new File(caminhoArquivo);

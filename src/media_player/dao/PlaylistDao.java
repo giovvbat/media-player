@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import media_player.modelo.Musica;
 import media_player.modelo.Playlist;
 import media_player.modelo.Usuario;
+import media_player.modelo.UsuarioVIP;
 
 public class PlaylistDao {
     ArrayList<Playlist> playlists;
@@ -64,7 +65,7 @@ public class PlaylistDao {
         }
     }
 
-    public void cadastrarPlaylist(String nome, ArrayList<Musica> musicas, Usuario usuarioDono) throws IOException {
+    public void cadastrarPlaylist(String nome, Usuario usuarioDono) throws IOException {
         String caminhoPlaylist = "arquivos/playlists/playlist_" + nome + ".txt";
         File arquivoPlaylist = new File(caminhoPlaylist);
 
@@ -78,23 +79,29 @@ public class PlaylistDao {
             writer.write(usuarioDono.getId());
             writer.newLine();
 
-            for(Musica musica : musicas) {
-                writer.write(musica.getNome());
-                writer.newLine();
-                writer.write(musica.getCaminho());
-                writer.newLine();
-            }
         } 
         catch (IOException e) {
             throw e;
         }
         
-        Playlist p = new Playlist(nome, musicas, usuarioDono);
+        Playlist p = new Playlist(nome, new ArrayList<>(), usuarioDono);
         playlists.add(p);
     }
 
-    public void adicionarMusica(Playlist playlist, Musica musica) throws IOException {
-        String caminhoPlaylist = "arquivos/playlists/playlist_" + playlist.getTitulo() + ".txt";
+    public void adicionarMusica(String nomePlaylist, Musica musica, Usuario usuario) throws IOException {
+        String caminhoPlaylist = "arquivos/playlists/playlist_" + nomePlaylist + ".txt";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(caminhoPlaylist))) {
+            String login = br.readLine();
+            int id = Integer.parseInt(br.readLine());
+
+            if (usuario.getId() != id || usuario.getLogin() != login) {
+                return;
+            }
+        }
+        catch (IOException e) {
+            throw e;
+        }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminhoPlaylist, true))) {
             writer.write(musica.getNome());
@@ -108,7 +115,7 @@ public class PlaylistDao {
 
         Playlist playlistArray = null;
         for(Playlist p : playlists) {
-            if(p.getTitulo() == playlist.getTitulo()) {
+            if(p.getTitulo() == nomePlaylist) {
                 playlistArray = p;
             }
         }
