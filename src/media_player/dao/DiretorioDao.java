@@ -16,6 +16,7 @@ public class DiretorioDao {
             writer.write(caminho);
             writer.newLine();
             diretorios.add(caminho);
+            escreverMusicas(caminho);
         } 
         catch (IOException e) {
             throw e;
@@ -26,7 +27,7 @@ public class DiretorioDao {
         String caminhoArquivo = "arquivos/diretorios.txt";
         File arquivo = new File(caminhoArquivo);
 
-        if (!arquivo.exists()){
+        if (!arquivo.exists()) {
             arquivo.getParentFile().mkdirs();
         }
 
@@ -34,6 +35,7 @@ public class DiretorioDao {
             String linha;
             while((linha = br.readLine()) != null) {
                 diretorios.add(linha);
+                escreverMusicas(linha);
             }
         }
         catch(IOException e) {
@@ -41,22 +43,20 @@ public class DiretorioDao {
         }
     }
 
-    public void escreverMusicas() throws IOException {
+    public void escreverMusicas(String caminhoDiretorio) throws IOException {
         String caminhoMusicas = "arquivos/musicas.txt";
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminhoMusicas))) {
-            for(String caminho : diretorios) {
-                File f = new File(caminho);
-                File[] arquivos = f.listFiles();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminhoMusicas, true))) {
+            File f = new File(caminhoDiretorio);
+            File[] arquivos = f.listFiles();
 
-                for(File arquivo : arquivos) {
-                    String caminhoArquivo = arquivo.getAbsolutePath();
-                    int indicePonto = caminhoArquivo.lastIndexOf(".");
+            for (File arquivo : arquivos) {
+                String caminhoArquivo = arquivo.getAbsolutePath();
+                int indicePonto = caminhoArquivo.lastIndexOf(".");
 
-                    if(indicePonto >= 0 && indicePonto < caminhoArquivo.length()) {
-                        if (caminhoArquivo.substring(indicePonto).equals("mp3")) {
-                            writer.write(caminhoArquivo);
-                            writer.newLine();
-                        }
+                if (indicePonto >= 0 && indicePonto < caminhoArquivo.length()) {
+                    if (caminhoArquivo.substring(indicePonto).equals("mp3")) {
+                        writer.write(caminhoArquivo);
+                        writer.newLine();
                     }
                 }
             }
@@ -64,8 +64,6 @@ public class DiretorioDao {
         catch (IOException e) {
             throw e;
         }
-        
-
     }
 
 }

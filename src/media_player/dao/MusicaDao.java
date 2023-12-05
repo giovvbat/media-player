@@ -25,6 +25,7 @@ public class MusicaDao {
 
         try(BufferedReader br = new BufferedReader(new FileReader(caminhoArquivo))) {
             String linha;
+            musicas.clear();
             while((linha = br.readLine()) != null) {
                 int indicePonto = linha.lastIndexOf(".");
                 String nomeMusica = linha.substring(0, indicePonto);

@@ -16,7 +16,7 @@ import media_player.modelo.UsuarioVIP;
 public class PlaylistDao {
     ArrayList<Playlist> playlists;
     
-    public void carregarPlaylists(ArrayList<Usuario> usuarios) throws IOException {
+    public void carregarPlaylists(Usuario usuario) throws IOException {
         String caminhoPasta = "arquivos/playlists";
         File pasta = new File(caminhoPasta);
 
@@ -26,23 +26,16 @@ public class PlaylistDao {
 
         for(File f : pasta.listFiles()) {
             int indiceInicio = f.getName().indexOf("_");
-            int indiceFinal = f.getName().lastIndexOf(".txt");
+            indiceInicio++;
+            int indiceFinal = f.getName().length() - 4;
+
             String nomePlaylist = f.getName().substring(indiceInicio, indiceFinal);
 
             try(BufferedReader br = new BufferedReader(new FileReader(f))) {
                 String nomeUsuario = br.readLine();
                 int idUsuario = Integer.parseInt(br.readLine());
 
-                Usuario usuario = null;
-
-                for(Usuario u : usuarios) {
-                    if(u.getLogin() == nomeUsuario && u.getId() == idUsuario) {
-                        usuario = u;
-                        break;
-                    }
-                }
-
-                if(usuario == null) {
+                if(nomeUsuario != usuario.getLogin() || idUsuario != usuario.getId()) {
                     continue;
                 }
 
@@ -65,15 +58,18 @@ public class PlaylistDao {
         }
     }
 
-    public void cadastrarPlaylist(String nome, Usuario usuarioDono) throws IOException {
+    public boolean cadastrarPlaylist(String nome, Usuario usuarioDono) throws IOException {
         String caminhoPlaylist = "arquivos/playlists/playlist_" + nome + ".txt";
         File arquivoPlaylist = new File(caminhoPlaylist);
 
         if (!arquivoPlaylist.exists()){
             arquivoPlaylist.getParentFile().mkdirs();
         }
+        else {
+            return false;
+        }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminhoPlaylist))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminhoPlaylist, true))) {
             writer.write(usuarioDono.getLogin());
             writer.newLine();
             writer.write(usuarioDono.getId());
@@ -81,11 +77,13 @@ public class PlaylistDao {
 
         } 
         catch (IOException e) {
-            throw e;
+            return false;
         }
         
         Playlist p = new Playlist(nome, new ArrayList<>(), usuarioDono);
         playlists.add(p);
+
+        return true;
     }
 
     public void adicionarMusica(String nomePlaylist, Musica musica, Usuario usuario) throws IOException {

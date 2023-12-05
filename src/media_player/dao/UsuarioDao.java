@@ -74,7 +74,7 @@ public class UsuarioDao {
         usuario.setId(ultimoId);
 
         String caminhoUsuarios = "arquivos/usuarios.txt";
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminhoUsuarios))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminhoUsuarios, true))) {
             writer.write(usuario.getLogin());
             writer.newLine();
             writer.write(usuario.getSenha());

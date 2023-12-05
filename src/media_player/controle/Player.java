@@ -20,6 +20,16 @@ public class Player {
     UsuarioDao u;
     DiretorioDao d;
     MusicaDao m;
+    javazoom.jl.player.Player playMP3;
+
+    public void carregarUsuarios() {
+        try {
+            u.carregarUsuarios();
+        }
+        catch(Exception e) {
+            throw e;
+        }
+    }
 
     public boolean fazerLogin(String senha, String login) {
         for(Usuario i : u.getUsuarios()) {
@@ -45,7 +55,45 @@ public class Player {
     public boolean cadastrarDiretorio(String caminho) {
         try {
             d.cadastrarDiretorio(caminho);
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean carregarDiretorios() {
+        try {
+            d.carregarDiretorios();
+        }
+        catch (IO Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean carregarMusicas() {
+        try {
+            m.carregarMusicas();
+        }
+        catch (IO Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean carregarPlaylists() {
+        if(!(usuarioLogado instanceof UsuarioVIP)) {
+            return false;
+        }
+
+        try {
+            ((UsuarioVIP)usuarioLogado).getP().carregarPlaylists(usuarioLogado);
+        }
+        catch (Exception e) {
             return false;
         }
 
@@ -58,14 +106,14 @@ public class Player {
         }
         try {
             ((UsuarioVIP)usuarioLogado).getP().cadastrarPlaylist(nome, usuarioLogado);
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             return false;
         }
 
         return true;
     }
     
-
     public boolean adicionarMusicaEmPlaylist(String caminhoMusica, String nomePlaylist) {
         if(!(usuarioLogado instanceof UsuarioVIP)) {
             return false;
@@ -85,10 +133,40 @@ public class Player {
         
         try {
             ((UsuarioVIP)usuarioLogado).getP().adicionarMusica(nomePlaylist, musicaAdicionada, usuarioLogado);
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
             return false;
         }
 
         return true;
+    }
+
+    public void tocarMusica(String caminho) {
+        try {
+            FileInputStream file = new FileInputStream(caminho);
+            javazoom.jl.player.advanced.AdvancedPlayer playMP3 = new javazoom.jl.player.advanced.AdvancedPlayer(file);
+
+            this.playMP3 = playMP3;
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        playMP3.play();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+
+        }
+        catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public void pararMusica() {
+        if(playMP3 != null) {
+            playMP3.close();
+        }
     }
 }
